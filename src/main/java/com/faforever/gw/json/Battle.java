@@ -1,5 +1,6 @@
 package com.faforever.gw.json;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -7,16 +8,16 @@ import java.util.List;
 public class Battle {
     private String attackingFaction = null;
     private String defendingFaction = null;
-    private String endedAt = null;
-    private Long id = null;
-    private LocalDateTime initiatedAt = null;
+    private Timestamp endedAt = null;
+    private Integer id = null;
+    private Timestamp initiatedAt = null;
     private List<BattleParticipant> participants = new ArrayList<BattleParticipant>();
     private Planet planet = null;
-    private LocalDateTime startedAt = null;
+    private Timestamp startedAt = null;
     private String status = null;
     private String winningFaction = null;
 
-    public Battle(String attackingFaction, String defendingFaction, String endedAt, Long id, LocalDateTime initiatedAt, List<BattleParticipant> participants, Planet planet, LocalDateTime startedAt, String status, String winningFaction) {
+    public Battle(String attackingFaction, String defendingFaction, Timestamp endedAt, Integer id, Timestamp initiatedAt, List<BattleParticipant> participants, Planet planet, Timestamp startedAt, String status, String winningFaction) {
         this.attackingFaction = attackingFaction;
         this.defendingFaction = defendingFaction;
         this.endedAt = endedAt;
@@ -37,15 +38,15 @@ public class Battle {
         return defendingFaction;
     }
 
-    public String getEndedAt() {
+    public Timestamp getEndedAt() {
         return endedAt;
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public LocalDateTime getInitiatedAt() {
+    public Timestamp getInitiatedAt() {
         return initiatedAt;
     }
 
@@ -57,7 +58,7 @@ public class Battle {
         return planet;
     }
 
-    public LocalDateTime getStartedAt() {
+    public Timestamp getStartedAt() {
         return startedAt;
     }
 

@@ -9,5 +9,4 @@ public class GalacticWarConfiguration {
     public static void main(String[] args) {
         SpringApplication.run(GalacticWarConfiguration.class, args);
     }
-
 }
