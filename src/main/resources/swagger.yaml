@@ -1,0 +1,747 @@
+---
+swagger: "2.0"
+info:
+  description: "The Galactic War API for FAForever"
+  version: "1.0.0"
+  title: "Galactic War"
+  contact: {}
+  license:
+    name: "Apache License 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0"
+host: "gw.faforever.com"
+basePath: "/1.0"
+tags:
+- name: "Universe"
+  description: "The GW universe (sun systems, planet, etc.)"
+- name: "Battle"
+- name: "Character management"
+- name: "Transaction Management"
+- name: "Debug"
+schemes:
+- "http"
+paths:
+  /battles:
+    post:
+      tags:
+      - "Battle"
+      summary: "Begin assault"
+      description: "Starts an assault of the planet\nPuts the player's character as\
+        \ attacker\n\n- Requires the faction to differ from the player's faction\n\
+        - Requires the planet to be in reach for the player's faction\n- Requires\
+        \ the player to be idle"
+      consumes: []
+      produces:
+      - "application/json"
+      parameters:
+      - name: "planetId"
+        in: "query"
+        required: true
+        type: "integer"
+        format: "int64"
+        x-example: 55
+      responses:
+        200:
+          description: "Success\n\nReturns a battle with the requesting player as\
+            \ attacking participant."
+          schema:
+            $ref: "#/definitions/Battle"
+        400:
+          description: "Status 400"
+  /battles/{id}:
+    get:
+      tags:
+      - "Battle"
+      summary: "Retrieve battle by id"
+      consumes: []
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "id of the battle"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/Battle"
+        404:
+          description: "Battle not found"
+    post:
+      tags:
+      - "Battle"
+      summary: "Post results"
+      description: "Posts the result for this battle\n// This is supposed to be called\
+        \ from the server //\n// API-call for testing purposes //\n\nBackground activities:\n\
+        - Planet ownership gets updated\n- XP and Credits are generated\n- Characters\
+        \ are set to idle or deceased"
+      consumes:
+      - "application/json"
+      produces: []
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "id of the battle"
+        required: true
+        type: "integer"
+        format: "int64"
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/Battle"
+      responses:
+        200:
+          description: "Succes"
+        404:
+          description: "Error 404 - Battle not found"
+    patch:
+      tags:
+      - "Battle"
+      summary: "Set game to started"
+      description: "Set game to started\n// This is supposed to be called from the\
+        \ server //\n// API-call for testing purposes //"
+      consumes: []
+      produces: []
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "id of the battle"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        200:
+          description: "OK"
+  /battles/{id}/participants:
+    post:
+      tags:
+      - "Battle"
+      summary: "Join battle"
+      description: "- Requires an open slot matching the player's faction's role (attacker\
+        \ / defender)\n- Requires the player to be idle\n- Requires the player to\
+        \ own the dispatched units"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "id of the battle"
+        required: true
+        type: "integer"
+        format: "int64"
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          type: "array"
+          items:
+            $ref: "#/definitions/Unit Transaction Details"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/Battle"
+        400:
+          description: "Status 400"
+    delete:
+      tags:
+      - "Battle"
+      summary: "Retract from battle"
+      description: "Removes a character from the participants list. The character's\
+        \ id is taken from his session,\nIf the last attacker retracts from battle,\
+        \ the battle status is set to canceled.\n\n- Requires the player to be in\
+        \ the pariticpants list\n- Requires the battle not to have status 'Initiated'"
+      consumes: []
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "id of the battle"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/Battle"
+        400:
+          description: "Status 400"
+  /characters:
+    post:
+      tags:
+      - "Character management"
+      summary: "Create new character"
+      description: "// Authentication against FAF required to get FAF user id //\n\
+        Creates a new character for the chosen faction.\nFails when, the user already\
+        \ has an active character.\nCharacters is bound to the logged in FAF account."
+      consumes: []
+      produces:
+      - "application/json"
+      parameters:
+      - name: "faction"
+        in: "query"
+        description: "[U]ef, [A]eon, [C]ybran, [S]eraphim"
+        required: false
+        type: "string"
+        x-example: "U"
+      responses:
+        200:
+          description: "Returns the newly generated character."
+          schema:
+            $ref: "#/definitions/Character"
+        403:
+          description: "Status 403"
+        409:
+          description: "Thrown because user already has an active character."
+  /characters/hall_of_fame/{faction}:
+    get:
+      tags:
+      - "Character management"
+      summary: "Retrieve the hall of fame-character by faction"
+      consumes: []
+      produces:
+      - "application/json"
+      parameters:
+      - name: "faction"
+        in: "path"
+        description: "Can be 'aeon', 'cybran', 'seraphim', 'uef' or 'all'"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Succsess"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Character"
+  /characters/online/{faction}:
+    get:
+      tags:
+      - "Character management"
+      summary: "Retrieves all characters currently online by faction"
+      description: ""
+      consumes: []
+      produces:
+      - "application/json"
+      parameters:
+      - name: "faction"
+        in: "path"
+        description: "Can be 'aeon', 'cybran', 'seraphim', 'uef' or 'all'"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Character"
+  /characters/top10/{faction}:
+    get:
+      tags:
+      - "Character management"
+      summary: "Retrieves the top 10 characters by faction"
+      consumes: []
+      produces:
+      - "application/json"
+      parameters:
+      - name: "faction"
+        in: "path"
+        description: "Can be 'aeon', 'cybran', 'seraphim', 'uef' or 'all'"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Character"
+  /characters/{id}:
+    get:
+      tags:
+      - "Character management"
+      summary: "Retrive character by id"
+      consumes: []
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "id of the characters"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        200:
+          description: "Status 200"
+          schema:
+            $ref: "#/definitions/Character"
+        404:
+          description: "Status 404 - Player not found"
+  /characters/{id}/credit_journal:
+    get:
+      tags:
+      - "Character management"
+      summary: "Retrieve credit journal"
+      consumes: []
+      produces: []
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "id of the character"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        200:
+          description: "Success"
+        404:
+          description: "Status 404 - Player not found"
+  /characters/{id}/unit_transactions:
+    get:
+      tags:
+      - "Character management"
+      summary: "Retrieve all unit transactions"
+      consumes: []
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "id of the player"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Unit Transaction"
+        404:
+          description: "Error 404 - Player not found"
+    post:
+      tags:
+      - "Character management"
+      summary: "Place a unit buy order"
+      description: "- Requires the player to have enough credits."
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "id of the player"
+        required: true
+        type: "integer"
+        format: "int64"
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          type: "array"
+          items:
+            $ref: "#/definitions/Unit Transaction Details"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/Unit Transaction"
+        400:
+          description: "Status 400"
+  /debug/calculate_promotions:
+    get:
+      tags:
+      - "Debug"
+      summary: "Force calculating promotions"
+      consumes: []
+      produces: []
+      parameters: []
+      responses:
+        200:
+          description: "OK"
+  /debug/regular_income:
+    get:
+      tags:
+      - "Debug"
+      summary: "Generate regular income"
+      consumes: []
+      produces: []
+      parameters: []
+      responses:
+        200:
+          description: "OK"
+  /sun_systems:
+    get:
+      tags:
+      - "Universe"
+      summary: "Retrieves collection of sun systems"
+      consumes: []
+      produces:
+      - "application/json"
+      parameters:
+      - name: "retrieve_planets"
+        in: "query"
+        description: "Set to true, if the planets shall not be listed in the sun systems."
+        required: false
+        type: "boolean"
+        x-example: "false"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Sun System"
+  /sun_systems/{id}:
+    get:
+      tags:
+      - "Universe"
+      summary: "Finds sun system by id"
+      consumes: []
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/Sun System"
+        404:
+          description: "Error 404 - Sun System not found"
+  /sun_systems/{id}/planets:
+    get:
+      tags:
+      - "Universe"
+      summary: "Retrieves collection of planets for a sun system"
+      consumes: []
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Planet"
+        404:
+          description: "Error 404 - Sun System not found"
+  /sun_systems/{id}/planets/{planet-id}:
+    get:
+      tags:
+      - "Universe"
+      summary: "Retrieves planet info"
+      consumes: []
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "id of the sun system"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "planet-id"
+        in: "path"
+        description: "id of the planet"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            $ref: "#/definitions/Planet"
+        404:
+          description: "Error 404 - Planet not found"
+  /sun_systems/{id}/planets/{planet-id}/battles:
+    get:
+      tags:
+      - "Universe"
+      summary: "Retrievs collection of battles on this planet"
+      consumes: []
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "id of the sun system"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "planet-id"
+        in: "path"
+        description: "id of the planet"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        200:
+          description: "Success"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Battle"
+        404:
+          description: "Error 404 - Planet not found"
+definitions:
+  Battle:
+    type: "object"
+    required:
+    - "attacking_faction"
+    - "defending_faction"
+    - "ended_at"
+    - "id"
+    - "initiated_at"
+    - "participants"
+    - "planet"
+    - "started_at"
+    - "status"
+    - "winning_faction"
+    properties:
+      attacking_faction:
+        type: "string"
+        description: "[U]ef, [A]eon, [C]ybran, [S]eraphim"
+      defending_faction:
+        type: "string"
+        description: "[U]ef, [A]eon, [C]ybran, [S]eraphim"
+      ended_at:
+        type: "string"
+        description: "when battle was canceled or finished\n\ncan be null"
+      id:
+        type: "integer"
+        format: "int64"
+      initiated_at:
+        type: "string"
+        format: "date"
+      participants:
+        type: "array"
+        description: "can be empty, when nobody has joined yet"
+        items:
+          $ref: "#/definitions/Battle Participant"
+      planet:
+        description: "planet where battle took place"
+        $ref: "#/definitions/Planet"
+      started_at:
+        type: "string"
+        format: "date"
+        description: "can be NULL"
+      status:
+        type: "string"
+        description: "[I]nitiated, [C]anceled, [R]unning, [F]inished"
+      winning_faction:
+        type: "string"
+        description: "[U]ef, [A]eon, [C]ybran, [S]eraphim - NULL on draw"
+  Battle Participant:
+    type: "object"
+    properties:
+      character:
+        $ref: "#/definitions/Character"
+      result:
+        type: "string"
+        description: "[V]ictory, [D]eath, [R]ecall"
+      role:
+        type: "string"
+        description: "[A]ttacker, [D]efender"
+    description: "Represents the battle result of a specific character"
+  Character:
+    type: "object"
+    required:
+    - "faction"
+    - "id"
+    - "killedAt"
+    - "killedBy"
+    - "name"
+    - "rankId"
+    - "rankTitle"
+    properties:
+      currentCredits:
+        type: "integer"
+        format: "int64"
+      currentXp:
+        type: "integer"
+        format: "int64"
+      faction:
+        type: "string"
+      id:
+        type: "integer"
+        format: "int32"
+      killedAt:
+        type: "string"
+        format: "date"
+        description: "can be NULL"
+      killedBy:
+        description: "can be NULL"
+        $ref: "#/definitions/Character"
+      name:
+        type: "string"
+      rankId:
+        type: "integer"
+        format: "int32"
+        description: "Internal ID of the character's rank"
+      rankTitle:
+        type: "string"
+        description: "Textual representation of the character's rank"
+  Credit Journal Entry:
+    type: "object"
+    required:
+    - "amount"
+    - "battle"
+    - "id"
+    - "reason"
+    - "transactionDate"
+    properties:
+      amount:
+        type: "integer"
+        format: "int64"
+        description: "positive on income, negative on expenses"
+      battle:
+        description: "Battle where credits were gained\ncan be null"
+        $ref: "#/definitions/Battle"
+      id:
+        type: "integer"
+        format: "int64"
+      reason:
+        type: "string"
+        description: "Regular [I]ncome, [V]ictory, ACU [K]ill, [R]einforcements"
+      transactionDate:
+        type: "string"
+        format: "date"
+      unitTransaction:
+        description: "Unit transaction where credits were spent\ncan benull"
+        $ref: "#/definitions/Unit Transaction"
+  Planet:
+    type: "object"
+    required:
+    - "current_owner"
+    - "fk_map"
+    - "ground"
+    - "habitable"
+    - "id"
+    - "orbit level"
+    - "size"
+    properties:
+      current_owner:
+        type: "string"
+        description: "[U]ef, [A]eon, [C]ybran, [S]eraphim"
+      fk_map:
+        type: "string"
+        description: "id of the map for this planet"
+      fk_sun_system:
+        type: "integer"
+        format: "int64"
+        description: "id of the sun system this planet belongs to"
+      ground:
+        type: "string"
+        description: "[W]ater, [S]oil, [L]ava, [D]esert, [F]rost"
+      habitable:
+        type: "boolean"
+        default: false
+      id:
+        type: "integer"
+        format: "int64"
+      orbit level:
+        type: "integer"
+        format: "int64"
+        description: "distance to the center of the sun system"
+      size:
+        type: "integer"
+        format: "int32"
+        description: "equivalent to map size 5,10,20,40"
+  Sun System:
+    type: "object"
+    required:
+    - "connections"
+    - "id"
+    - "name"
+    - "x"
+    - "y"
+    - "z"
+    properties:
+      connections:
+        type: "array"
+        description: "list of sun systems in reach"
+        items:
+          type: "integer"
+          format: "int64"
+      id:
+        type: "integer"
+        format: "int64"
+      name:
+        type: "string"
+      planets:
+        type: "array"
+        items:
+          $ref: "#/definitions/Planet"
+      x:
+        type: "integer"
+        format: "int64"
+        description: "x-Coordinate"
+      y:
+        type: "integer"
+        format: "int64"
+        description: "y-Coordinate"
+      z:
+        type: "integer"
+        format: "int64"
+        description: "z-Coordinate"
+  Unit Transaction:
+    type: "object"
+    required:
+    - "created_at"
+    - "details"
+    - "id"
+    - "type"
+    properties:
+      battle:
+        description: "battle where units were used\nonly on type=dispatch"
+        $ref: "#/definitions/Battle"
+      created_at:
+        type: "string"
+        format: "date"
+      details:
+        description: "details of the unit transaction"
+        $ref: "#/definitions/Unit Transaction Details"
+      id:
+        type: "integer"
+        format: "int64"
+        description: "id of the unit transaction"
+      type:
+        type: "integer"
+        format: "int64"
+        description: "[B]uy, [D]ispatch"
+  Unit Transaction Details:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+        description: "id of the transaction detail"
+      quantity:
+        type: "integer"
+        format: "int64"
+        description: "quantity is negative on dispatch"
+      unitId:
+        type: "string"
+        description: "id of the unit"
