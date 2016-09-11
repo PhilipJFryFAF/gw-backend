@@ -1,16 +1,17 @@
 package com.faforever.gw.json;
 
+import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
 public class CreditJournalEntry {
-    private Long amount = null;
+    private Integer amount = null;
     private Battle battle = null;
-    private Long id = null;
+    private Integer id = null;
     private String reason = null;
-    private LocalDateTime transactionDate = null;
+    private Timestamp transactionDate = null;
     private UnitTransaction unitTransaction = null;
 
-    public CreditJournalEntry(Long amount, Battle battle, Long id, String reason, LocalDateTime transactionDate, UnitTransaction unitTransaction) {
+    public CreditJournalEntry(Integer amount, Battle battle, Integer id, String reason, Timestamp transactionDate, UnitTransaction unitTransaction) {
         this.amount = amount;
         this.battle = battle;
         this.id = id;
@@ -19,7 +20,7 @@ public class CreditJournalEntry {
         this.unitTransaction = unitTransaction;
     }
 
-    public Long getAmount() {
+    public Integer getAmount() {
         return amount;
     }
 
@@ -27,7 +28,7 @@ public class CreditJournalEntry {
         return battle;
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
@@ -35,7 +36,7 @@ public class CreditJournalEntry {
         return reason;
     }
 
-    public LocalDateTime getTransactionDate() {
+    public Timestamp getTransactionDate() {
         return transactionDate;
     }
 

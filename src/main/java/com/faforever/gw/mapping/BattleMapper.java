@@ -25,14 +25,7 @@ public class BattleMapper implements RecordMapper<BattlesRecord, Battle> {
 
     @Override
     public Battle map(BattlesRecord r) {
-        return new Battle(r.getAttackingFaction(), r.getDefendingFaction(), r.getEndedAt(), r.getId(), r.getInitiatedAt(), getBattleParticipants(r.getId()), null, r.getStartedAt(), r.getStatus(), r.getWinningFaction());
+        return new Battle(r.getAttackingFaction(), r.getDefendingFaction(), r.getEndedAt(), r.getId(), r.getInitiatedAt(), null, r.getStartedAt(), r.getStatus(), r.getWinningFaction());
     }
 
-    private List<BattleParticipant> getBattleParticipants(int battleID) {
-        List<BattleParticipant> battleParticipants =
-                dslContext.selectFrom(BATTLE_PARTICIPANTS).where(BATTLE_PARTICIPANTS.FK_BATTLE.equal(battleID))
-                        .fetch().map(new BattleParticipantMapper(dslContext));
-
-        return battleParticipants;
-    }
 }
