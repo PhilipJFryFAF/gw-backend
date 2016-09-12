@@ -1,8 +1,7 @@
 package com.faforever.gw.mapping;
 
-import com.faforever.gw.exceptions.EntityNotFoundException;
-import com.faforever.gw.json.Battle;
-import com.faforever.gw.json.Planet;
+import com.faforever.gw.model.Battle;
+import com.faforever.gw.model.Planet;
 import com.faforever.gw.tables.records.BattlesRecord;
 import org.jooq.DSLContext;
 import org.jooq.RecordMapper;

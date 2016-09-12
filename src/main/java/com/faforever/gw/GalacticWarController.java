@@ -1,18 +1,13 @@
 package com.faforever.gw;
 
-import com.faforever.gw.json.Battle;
-import com.faforever.gw.json.Character;
-import com.faforever.gw.json.CreditJournalEntry;
+import com.faforever.gw.model.Battle;
+import com.faforever.gw.model.Character;
+import com.faforever.gw.model.CreditJournalEntry;
 import com.faforever.gw.mapping.CreditJournalMapper;
-import com.faforever.gw.tables.pojos.MapPool;
 import org.jooq.DSLContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -21,44 +16,18 @@ import java.util.Optional;
 import static com.faforever.gw.Tables.CHARACTERS;
 import static com.faforever.gw.Tables.CREDIT_JOURNAL;
 
-@Controller
+@RestController
 @RequestMapping("/gw")
 public class GalacticWarController {
 
     @Resource
     private DSLContext dslContext;
 
-    @RequestMapping(value = "battles/{id}", method = RequestMethod.GET)
-    public
-    @ResponseBody
-    ResponseEntity<Battle> getBattleById(@PathVariable("id") int battleID) {
-        Optional<Battle> battleOptional = Battle.selectById(dslContext, battleID);
-
-        if (battleOptional.isPresent()) {
-            return new ResponseEntity(battleOptional.get(), HttpStatus.OK);
-        } else {
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
-        }
-    }
-
-    @RequestMapping(value = "characters/{id}", method = RequestMethod.GET)
-    public
-    @ResponseBody
-    ResponseEntity<Character> getCharacterById(@PathVariable("id") int characterID) {
-        Optional<Character> characterOptional = Character.selectById(dslContext, characterID);
-
-        if (characterOptional.isPresent()) {
-            return new ResponseEntity(characterOptional.get(), HttpStatus.OK);
-        } else {
-            return new ResponseEntity(HttpStatus.NOT_FOUND);
-        }
-
-    }
 
     @RequestMapping(value = "characters/{id}/credit_journal", method = RequestMethod.GET)
     public
     @ResponseBody
-    ResponseEntity<List<CreditJournalEntry>> getCreditJournal(@PathVariable("id") int characterID) {
+    ResponseEntity<List<CreditJournalEntry>> getCreditJournal(@PathVariable("id") Long characterID) {
         int count = dslContext.select(CHARACTERS.ID.count()).from(CHARACTERS).where(CHARACTERS.ID.equal(characterID)).fetchOne(0, int.class);
 
         if (count == 0)
@@ -69,10 +38,26 @@ public class GalacticWarController {
     }
 
 
-    @RequestMapping(value = "mappool", method = RequestMethod.GET)
+    @RequestMapping(value = "characters/hall_of_fame/{faction}", method = RequestMethod.GET)
     public
     @ResponseBody
-    List<MapPool> getMapPool() {
-        return dslContext.selectFrom(Tables.MAP_POOL).fetchInto(MapPool.class);
+    ResponseEntity<List<Character>> getHallOfFame(@PathVariable("faction") String faction) {
+        return null;
+//        List<Character> characterList;
+//
+//        Field<Integer> credits = create.select(sum(CREDIT_JOURNAL.AMOUNT)).from(CREDIT_JOURNAL).where(CREDIT_JOURNAL.FK_CHARACTER.equal(id)).asField("CREDITS");
+//        Field<Integer> xp = create.select(sum(XP_JOURNAL.AMOUNT)).from(XP_JOURNAL).where(XP_JOURNAL.FK_CHARACTER.equal(id)).asField("XP");
+//        Field<Integer> rankId = create.select(PROMOTIONS.NEW_RANK).from(PROMOTIONS).where(PROMOTIONS.FK_CHARACTER.equal(id)).orderBy(PROMOTIONS.CREATED_AT.desc()).limit(1).asField("RANK_ID");
+//
+//        Character c = create.select(CHARACTERS.ID, CHARACTERS.NAME, CHARACTERS.FACTION, CHARACTERS.KILLED_BY, credits, xp, rankId)
+//                .from(CHARACTERS)
+//                .where(CHARACTERS.ID.equal(id))
+//                .fetchOne()
+//                .into(Character.class);
+//
+//        if( faction == null || faction.isEmpty()){
+//
+//        }
+
     }
 }

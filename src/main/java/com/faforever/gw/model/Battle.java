@@ -1,6 +1,5 @@
-package com.faforever.gw.json;
+package com.faforever.gw.model;
 
-import com.faforever.gw.exceptions.EntityNotFoundException;
 import com.faforever.gw.mapping.BattleMapper;
 import org.jooq.DSLContext;
 
@@ -13,14 +12,14 @@ public class Battle {
     private String attackingFaction;
     private String defendingFaction;
     private Timestamp endedAt;
-    private Integer id;
+    private Long id;
     private Timestamp initiatedAt;
     private Planet planet;
     private Timestamp startedAt;
     private String status;
     private String winningFaction;
 
-    public Battle(String attackingFaction, String defendingFaction, Timestamp endedAt, Integer id, Timestamp initiatedAt, Planet planet, Timestamp startedAt, String status, String winningFaction) {
+    public Battle(String attackingFaction, String defendingFaction, Timestamp endedAt, Long id, Timestamp initiatedAt, Planet planet, Timestamp startedAt, String status, String winningFaction) {
         this.attackingFaction = attackingFaction;
         this.defendingFaction = defendingFaction;
         this.endedAt = endedAt;
@@ -32,7 +31,7 @@ public class Battle {
         this.winningFaction = winningFaction;
     }
 
-    public static Optional<Battle> selectById(DSLContext create, Integer battleID) {
+    public static Optional<Battle> selectById(DSLContext create, Long battleID) {
         return create.selectFrom(BATTLES).where(BATTLES.ID.equal(battleID)).fetchOptional(new BattleMapper());
     }
 
@@ -48,7 +47,7 @@ public class Battle {
         return endedAt;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 

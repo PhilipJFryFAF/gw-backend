@@ -1,11 +1,7 @@
-package com.faforever.gw.json;
+package com.faforever.gw.model;
 
-import com.faforever.gw.exceptions.EntityNotFoundException;
 import com.faforever.gw.mapping.PlanetMapper;
 import org.jooq.DSLContext;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.Resource;
 
 import java.util.Optional;
 
@@ -13,15 +9,15 @@ import static com.faforever.gw.Tables.PLANETS;
 
 public class Planet {
     private String currentOwner = null;
-    private Integer fkMap = null;
-    private Integer fkSunSystem = null;
+    private Long fkMap = null;
+    private Long fkSunSystem = null;
     private String ground = null;
     private Boolean habitable = false;
-    private Integer id = null;
-    private Integer orbitLevel = null;
-    private Integer size = null;
+    private Long id = null;
+    private Long orbitLevel = null;
+    private Long size = null;
 
-    public Planet(String currentOwner, Integer fkMap, Integer fkSunSystem, String ground, Boolean habitable, Integer id, Integer orbitLevel, Integer size) {
+    public Planet(String currentOwner, Long fkMap, Long fkSunSystem, String ground, Boolean habitable, Long id, Long orbitLevel, Long size) {
         this.currentOwner = currentOwner;
         this.fkMap = fkMap;
         this.fkSunSystem = fkSunSystem;
@@ -32,7 +28,7 @@ public class Planet {
         this.size = size;
     }
 
-    public static Optional<Planet> selectById(DSLContext create, Integer id) {
+    public static Optional<Planet> selectById(DSLContext create, Long id) {
             return create.selectFrom(PLANETS).where(PLANETS.ID.equal(id)).fetchOptional(new PlanetMapper());
     }
 
@@ -40,11 +36,11 @@ public class Planet {
         return currentOwner;
     }
 
-    public Integer getFkMap() {
+    public Long getFkMap() {
         return fkMap;
     }
 
-    public Integer getFkSunSystem() {
+    public Long getFkSunSystem() {
         return fkSunSystem;
     }
 
@@ -56,15 +52,15 @@ public class Planet {
         return habitable;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public Integer getOrbitLevel() {
+    public Long getOrbitLevel() {
         return orbitLevel;
     }
 
-    public Integer getSize() {
+    public Long getSize() {
         return size;
     }
 }

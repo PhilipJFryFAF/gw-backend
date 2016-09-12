@@ -44,6 +44,16 @@ jooq {
             database {
                 name = 'org.jooq.util.mysql.MySQLDatabase'
                 inputSchema = 'gw'
+                forcedTypes {
+                    forcedType {
+                        name = 'BIGINT'
+                        types = 'int'
+                    }
+                    forcedType {
+                        name = 'BOOLEAN'
+                        types = 'tinyint'
+                    }
+                }
             }
             generate {
                 relations = true
@@ -68,6 +78,8 @@ dependencies {
     compile("org.springframework.boot:spring-boot-starter-data-jpa")
     compile("org.flywaydb:flyway-core:4.0.3")
     compile("org.mariadb.jdbc:mariadb-java-client:1.4.6")
+    compile("io.katharsis:katharsis-spring:2.6.0")
+    compile("org.reflections:reflections:0.9.9")
     testCompile("org.springframework.boot:spring-boot-starter-test")
     testCompile("junit:junit")
 }

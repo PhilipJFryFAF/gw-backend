@@ -1,4 +1,4 @@
-package com.faforever.gw.json;
+package com.faforever.gw.model;
 
 import java.time.LocalDateTime;
 
