@@ -11,6 +11,7 @@ import org.jooq.DSLContext;
 
 import javax.annotation.Resource;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Optional;
 
 import static com.faforever.gw.Tables.*;
@@ -29,7 +30,7 @@ public class Character {
     @JsonApiId
     private Long id = null;
     @JsonProperty
-    private Timestamp killedAt;
+    private Instant killedAt;
     @JsonApiToOne
     private Character killedBy;
     @JsonProperty
@@ -71,11 +72,11 @@ public class Character {
         this.id = id;
     }
 
-    public Timestamp getKilledAt() {
+    public Instant getKilledAt() {
         return killedAt;
     }
 
-    public void setKilledAt(Timestamp killedAt) {
+    public void setKilledAt(Instant killedAt) {
         this.killedAt = killedAt;
     }
 
@@ -116,7 +117,7 @@ public class Character {
     public Character() {
     }
 
-    public Character(Long currentCredits, Long currentXp, String faction, Long id, Timestamp killedAt, Character killedBy, String name, Long rankId, String rankTitle) {
+    public Character(Long currentCredits, Long currentXp, String faction, Long id, Instant killedAt, Character killedBy, String name, Long rankId, String rankTitle) {
         this.currentCredits = currentCredits;
         this.currentXp = currentXp;
         this.faction = faction;

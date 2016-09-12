@@ -53,6 +53,10 @@ jooq {
                         name = 'BOOLEAN'
                         types = 'tinyint'
                     }
+                    forcedType {
+                        name = 'java.time.Instant'
+                        types = 'datetime'
+                    }
                 }
             }
             generate {
