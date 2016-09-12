@@ -1,12 +1,14 @@
 package com.faforever.gw.json;
 
-import com.faforever.gw.exceptions.EntityNotFoundException;
+import com.faforever.gw.exceptions.SemanticsException;
+import com.faforever.gw.mapping.CharacterMapper;
 import com.faforever.gw.tables.records.RanksRecord;
 import org.jooq.DSLContext;
 import org.jooq.Field;
 
 import javax.persistence.Column;
 import java.sql.Timestamp;
+import java.util.Optional;
 
 import static com.faforever.gw.Tables.*;
 import static org.jooq.impl.DSL.sum;
@@ -119,41 +121,43 @@ public class Character {
         this.rankTitle = rankTitle;
     }
 
-    public static Character selectById(DSLContext create, Integer id) throws EntityNotFoundException {
-        try {
-            Field<Integer> credits = create.select(sum(CREDIT_JOURNAL.AMOUNT)).from(CREDIT_JOURNAL).where(CREDIT_JOURNAL.FK_CHARACTER.equal(id)).asField("CREDITS");
-            Field<Integer> xp = create.select(sum(XP_JOURNAL.AMOUNT)).from(XP_JOURNAL).where(XP_JOURNAL.FK_CHARACTER.equal(id)).asField("XP");
-            Field<Integer> rankId = create.select(PROMOTIONS.NEW_RANK).from(PROMOTIONS).where(PROMOTIONS.FK_CHARACTER.equal(id)).orderBy(PROMOTIONS.CREATED_AT.desc()).limit(1).asField("RANK_ID");
+    public static Optional<Character> selectById(DSLContext create, Integer id)  {
+        Optional<Character> characterOptional = create.selectFrom(CHARACTERS)
+                .where(CHARACTERS.ID.equal(id))
+                .fetchOptional(CharacterMapper.INSTANCE);
 
-            Character c = create.select(CHARACTERS.ID, CHARACTERS.NAME, CHARACTERS.FACTION, CHARACTERS.KILLED_BY, credits, xp, rankId)
-                    .from(CHARACTERS)
-                    .where(CHARACTERS.ID.equal(id))
-                    .fetchOne()
-                    .into(Character.class);
+        if(characterOptional.isPresent()) {
+            Character character = characterOptional.get();
 
+            Long currentCredits = create.select(sum(CREDIT_JOURNAL.AMOUNT)).from(CREDIT_JOURNAL).where(CREDIT_JOURNAL.FK_CHARACTER.equal(id)).fetchOneInto(Long.class);
+            character.setCurrentCredits(currentCredits);
 
-            RanksRecord ranksRecord = create.selectFrom(RANKS).where(RANKS.LEVEL.eq(c.rankId)).fetchOneInto(RanksRecord.class);
+            Long currentXp = create.select(sum(XP_JOURNAL.AMOUNT)).from(XP_JOURNAL).where(XP_JOURNAL.FK_CHARACTER.equal(id)).fetchOneInto(Long.class);
+            character.setCurrentXp(currentXp);
 
-            switch (c.faction) {
+            Integer rankId = create.select(PROMOTIONS.NEW_RANK).from(PROMOTIONS).where(PROMOTIONS.FK_CHARACTER.equal(id)).orderBy(PROMOTIONS.CREATED_AT.desc()).limit(1).fetchOneInto(Integer.class);
+            character.setRankId(rankId);
 
+            RanksRecord ranksRecord = create.selectFrom(RANKS).where(RANKS.LEVEL.eq(character.rankId)).fetchOptionalInto(RanksRecord.class)
+                    .orElseThrow(() -> new SemanticsException("There must be a rank for each character rank level."));
+
+            switch (character.faction) {
                 case "A":
-                    c.setRankTitle(ranksRecord.getAeonTitle());
+                    character.setRankTitle(ranksRecord.getAeonTitle());
                     break;
                 case "C":
-                    c.setRankTitle(ranksRecord.getCybranTitle());
+                    character.setRankTitle(ranksRecord.getCybranTitle());
                     break;
                 case "S":
-                    c.setRankTitle(ranksRecord.getSeraphTitle());
+                    character.setRankTitle(ranksRecord.getSeraphTitle());
                     break;
                 case "U":
-                    c.setRankTitle(ranksRecord.getUefTitle());
+                    character.setRankTitle(ranksRecord.getUefTitle());
                     break;
             }
-
-            return c;
-        } catch (NullPointerException e) {
-            throw new EntityNotFoundException(CHARACTERS.getClass(), String.format("id = %s", id));
         }
+
+        return characterOptional;
     }
 
 }

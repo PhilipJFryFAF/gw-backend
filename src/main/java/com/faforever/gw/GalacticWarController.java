@@ -1,11 +1,9 @@
 package com.faforever.gw;
 
-import com.faforever.gw.exceptions.EntityNotFoundException;
 import com.faforever.gw.json.Battle;
 import com.faforever.gw.json.Character;
 import com.faforever.gw.json.CreditJournalEntry;
 import com.faforever.gw.mapping.CreditJournalMapper;
-import com.faforever.gw.tables.pojos.CreditJournal;
 import com.faforever.gw.tables.pojos.MapPool;
 import org.jooq.DSLContext;
 import org.springframework.http.HttpStatus;
@@ -18,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Optional;
 
 import static com.faforever.gw.Tables.CHARACTERS;
 import static com.faforever.gw.Tables.CREDIT_JOURNAL;
@@ -33,9 +32,11 @@ public class GalacticWarController {
     public
     @ResponseBody
     ResponseEntity<Battle> getBattleById(@PathVariable("id") int battleID) {
-        try {
-            return new ResponseEntity(Battle.selectById(dslContext, battleID), HttpStatus.OK);
-        } catch (EntityNotFoundException e) {
+        Optional<Battle> battleOptional = Battle.selectById(dslContext, battleID);
+
+        if (battleOptional.isPresent()) {
+            return new ResponseEntity(battleOptional.get(), HttpStatus.OK);
+        } else {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
     }
@@ -44,11 +45,14 @@ public class GalacticWarController {
     public
     @ResponseBody
     ResponseEntity<Character> getCharacterById(@PathVariable("id") int characterID) {
-        try {
-            return new ResponseEntity(Character.selectById(dslContext, characterID), HttpStatus.OK);
-        } catch (EntityNotFoundException e) {
+        Optional<Character> characterOptional = Character.selectById(dslContext, characterID);
+
+        if (characterOptional.isPresent()) {
+            return new ResponseEntity(characterOptional.get(), HttpStatus.OK);
+        } else {
             return new ResponseEntity(HttpStatus.NOT_FOUND);
         }
+
     }
 
     @RequestMapping(value = "characters/{id}/credit_journal", method = RequestMethod.GET)

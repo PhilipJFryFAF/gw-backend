@@ -5,22 +5,20 @@ import com.faforever.gw.mapping.BattleMapper;
 import org.jooq.DSLContext;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Optional;
 
 import static com.faforever.gw.Tables.BATTLES;
 
 public class Battle {
-    private String attackingFaction = null;
-    private String defendingFaction = null;
-    private Timestamp endedAt = null;
-    private Integer id = null;
-    private Timestamp initiatedAt = null;
-    private Planet planet = null;
-    private Timestamp startedAt = null;
-    private String status = null;
-    private String winningFaction = null;
+    private String attackingFaction;
+    private String defendingFaction;
+    private Timestamp endedAt;
+    private Integer id;
+    private Timestamp initiatedAt;
+    private Planet planet;
+    private Timestamp startedAt;
+    private String status;
+    private String winningFaction;
 
     public Battle(String attackingFaction, String defendingFaction, Timestamp endedAt, Integer id, Timestamp initiatedAt, Planet planet, Timestamp startedAt, String status, String winningFaction) {
         this.attackingFaction = attackingFaction;
@@ -34,8 +32,8 @@ public class Battle {
         this.winningFaction = winningFaction;
     }
 
-    public static Battle selectById(DSLContext create, Integer battleID)throws EntityNotFoundException {
-        return create.selectFrom(BATTLES).where(BATTLES.ID.equal(battleID)).fetchOne(new BattleMapper(create));
+    public static Optional<Battle> selectById(DSLContext create, Integer battleID) {
+        return create.selectFrom(BATTLES).where(BATTLES.ID.equal(battleID)).fetchOptional(new BattleMapper());
     }
 
     public String getAttackingFaction() {

@@ -10,13 +10,18 @@ import com.faforever.gw.tables.records.CreditJournalRecord;
 import org.jooq.DSLContext;
 import org.jooq.RecordMapper;
 import org.jooq.exception.MappingException;
+import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import java.util.List;
+import java.util.Optional;
 
 import static com.faforever.gw.Tables.BATTLE_PARTICIPANTS;
 
+@Component
 public class CreditJournalMapper implements RecordMapper<CreditJournalRecord, CreditJournalEntry> {
-    private DSLContext dslContext;
+    @Resource
+    public DSLContext dslContext;
 
     private CreditJournalMapper(){}
 
@@ -26,12 +31,8 @@ public class CreditJournalMapper implements RecordMapper<CreditJournalRecord, Cr
 
     @Override
     public CreditJournalEntry map(CreditJournalRecord r) {
-        try {
-        return new CreditJournalEntry(r.getAmount(), Battle.selectById(dslContext, r.getFkBattle()), r.getId(), r.getReason(), r.getTransactionDate(), null);
-        }
-        catch( EntityNotFoundException e ){
-            throw new MappingException("Battle not found. id="+r.getFkBattle());
-        }
+        Optional<Battle> battleOptional = Battle.selectById(dslContext, r.getFkBattle());
+        return new CreditJournalEntry(r.getAmount(), battleOptional.get(), r.getId(), r.getReason(), r.getTransactionDate(), null);
     }
 
 }
