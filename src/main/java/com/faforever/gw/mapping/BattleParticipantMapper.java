@@ -1,19 +1,17 @@
 package com.faforever.gw.mapping;
 
-import com.faforever.gw.exceptions.EntityNotFoundException;
 import com.faforever.gw.model.BattleParticipant;
 import com.faforever.gw.model.Character;
 import com.faforever.gw.repository.CharacterRepository;
-import com.faforever.gw.tables.records.BattleParticipantsRecord;
+import com.faforever.gw.tables.records.BattleParticipantRecord;
 import org.jooq.DSLContext;
 import org.jooq.RecordMapper;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.Optional;
 
 @Component
-public class BattleParticipantMapper implements RecordMapper<BattleParticipantsRecord, BattleParticipant> {
+public class BattleParticipantMapper implements RecordMapper<BattleParticipantRecord, BattleParticipant> {
     @Resource
     DSLContext dslContext;
 
@@ -22,7 +20,7 @@ public class BattleParticipantMapper implements RecordMapper<BattleParticipantsR
 
 
     @Override
-    public BattleParticipant map(BattleParticipantsRecord r) {
+    public BattleParticipant map(BattleParticipantRecord r) {
         return null;//new BattleParticipant(getCharacter(r.getFkCharacter()), r.getResult(), r.getRole());
     }
 

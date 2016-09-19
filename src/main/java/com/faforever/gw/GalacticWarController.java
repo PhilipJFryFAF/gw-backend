@@ -1,9 +1,8 @@
 package com.faforever.gw;
 
-import com.faforever.gw.model.Battle;
+import com.faforever.gw.mapping.CreditJournalMapper;
 import com.faforever.gw.model.Character;
 import com.faforever.gw.model.CreditJournalEntry;
-import com.faforever.gw.mapping.CreditJournalMapper;
 import org.jooq.DSLContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,9 +10,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
-import java.util.Optional;
 
-import static com.faforever.gw.Tables.CHARACTERS;
+import static com.faforever.gw.Tables.CHARACTER;
 import static com.faforever.gw.Tables.CREDIT_JOURNAL;
 
 @RestController
@@ -28,12 +26,12 @@ public class GalacticWarController {
     public
     @ResponseBody
     ResponseEntity<List<CreditJournalEntry>> getCreditJournal(@PathVariable("id") Long characterID) {
-        int count = dslContext.select(CHARACTERS.ID.count()).from(CHARACTERS).where(CHARACTERS.ID.equal(characterID)).fetchOne(0, int.class);
+        int count = dslContext.select(CHARACTER.ID.count()).from(CHARACTER).where(CHARACTER.ID.equal(characterID)).fetchOne(0, int.class);
 
         if (count == 0)
             return new ResponseEntity(HttpStatus.NOT_FOUND);
 
-        List<CreditJournalEntry> creditJournals = dslContext.selectFrom(CREDIT_JOURNAL).where(CHARACTERS.ID.equal(characterID)).fetch().map(new CreditJournalMapper(dslContext));
+        List<CreditJournalEntry> creditJournals = dslContext.selectFrom(CREDIT_JOURNAL).where(CHARACTER.ID.equal(characterID)).fetch().map(new CreditJournalMapper(dslContext));
         return new ResponseEntity(null, HttpStatus.OK);
     }
 

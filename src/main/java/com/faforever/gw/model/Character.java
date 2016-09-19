@@ -1,21 +1,13 @@
 package com.faforever.gw.model;
 
-import com.faforever.gw.exceptions.SemanticsException;
 import com.faforever.gw.mapping.CharacterMapper;
-import com.faforever.gw.tables.records.RanksRecord;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.katharsis.resource.annotations.JsonApiId;
 import io.katharsis.resource.annotations.JsonApiResource;
 import io.katharsis.resource.annotations.JsonApiToOne;
-import org.jooq.DSLContext;
 
 import javax.annotation.Resource;
-import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.Optional;
-
-import static com.faforever.gw.Tables.*;
-import static org.jooq.impl.DSL.sum;
 
 @JsonApiResource(type = "characters")
 public class Character {
@@ -39,6 +31,21 @@ public class Character {
     private Long rankId;
     @JsonProperty
     private String rankTitle;
+
+    public Character() {
+    }
+
+    public Character(Long currentCredits, Long currentXp, String faction, Long id, Instant killedAt, Character killedBy, String name, Long rankId, String rankTitle) {
+        this.currentCredits = currentCredits;
+        this.currentXp = currentXp;
+        this.faction = faction;
+        this.id = id;
+        this.killedAt = killedAt;
+        this.killedBy = killedBy;
+        this.name = name;
+        this.rankId = rankId;
+        this.rankTitle = rankTitle;
+    }
 
     public Long getCurrentCredits() {
         return (currentCredits == null) ? 0 : currentCredits;
@@ -100,7 +107,6 @@ public class Character {
         return rankId;
     }
 
-
     public void setRankId(Long rankId) {
         this.rankId = rankId;
     }
@@ -109,23 +115,7 @@ public class Character {
         return rankTitle;
     }
 
-
     public void setRankTitle(String rankTitle) {
-        this.rankTitle = rankTitle;
-    }
-
-    public Character() {
-    }
-
-    public Character(Long currentCredits, Long currentXp, String faction, Long id, Instant killedAt, Character killedBy, String name, Long rankId, String rankTitle) {
-        this.currentCredits = currentCredits;
-        this.currentXp = currentXp;
-        this.faction = faction;
-        this.id = id;
-        this.killedAt = killedAt;
-        this.killedBy = killedBy;
-        this.name = name;
-        this.rankId = rankId;
         this.rankTitle = rankTitle;
     }
 

@@ -5,7 +5,7 @@ import org.jooq.DSLContext;
 
 import java.util.Optional;
 
-import static com.faforever.gw.Tables.PLANETS;
+import static com.faforever.gw.Tables.PLANET;
 
 public class Planet {
     private String currentOwner = null;
@@ -29,7 +29,7 @@ public class Planet {
     }
 
     public static Optional<Planet> selectById(DSLContext create, Long id) {
-            return create.selectFrom(PLANETS).where(PLANETS.ID.equal(id)).fetchOptional(new PlanetMapper());
+        return create.selectFrom(PLANET).where(PLANET.ID.equal(id)).fetchOptional(new PlanetMapper());
     }
 
     public String getCurrentOwner() {

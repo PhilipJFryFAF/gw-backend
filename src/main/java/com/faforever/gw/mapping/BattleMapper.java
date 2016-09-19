@@ -2,7 +2,7 @@ package com.faforever.gw.mapping;
 
 import com.faforever.gw.model.Battle;
 import com.faforever.gw.model.Planet;
-import com.faforever.gw.tables.records.BattlesRecord;
+import com.faforever.gw.tables.records.BattleRecord;
 import org.jooq.DSLContext;
 import org.jooq.RecordMapper;
 import org.jooq.exception.MappingException;
@@ -12,12 +12,12 @@ import javax.annotation.Resource;
 import java.util.Optional;
 
 @Component
-public class BattleMapper implements RecordMapper<BattlesRecord, Battle> {
+public class BattleMapper implements RecordMapper<BattleRecord, Battle> {
     @Resource
     public DSLContext create;
 
     @Override
-    public Battle map(BattlesRecord r) {
+    public Battle map(BattleRecord r) {
         Optional<Planet> planetOptional = Planet.selectById(create, r.getFkPlanet());
 
         if(planetOptional.isPresent())

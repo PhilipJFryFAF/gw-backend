@@ -6,7 +6,7 @@ import org.jooq.DSLContext;
 import java.sql.Timestamp;
 import java.util.Optional;
 
-import static com.faforever.gw.Tables.BATTLES;
+import static com.faforever.gw.Tables.BATTLE;
 
 public class Battle {
     private String attackingFaction;
@@ -32,7 +32,7 @@ public class Battle {
     }
 
     public static Optional<Battle> selectById(DSLContext create, Long battleID) {
-        return create.selectFrom(BATTLES).where(BATTLES.ID.equal(battleID)).fetchOptional(new BattleMapper());
+        return create.selectFrom(BATTLE).where(BATTLE.ID.equal(battleID)).fetchOptional(new BattleMapper());
     }
 
     public String getAttackingFaction() {
