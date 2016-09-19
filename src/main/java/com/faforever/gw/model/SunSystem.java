@@ -1,28 +1,38 @@
 package com.faforever.gw.model;
 
+import io.katharsis.resource.annotations.JsonApiId;
+import io.katharsis.resource.annotations.JsonApiResource;
+import io.katharsis.resource.annotations.JsonApiToMany;
+
 import java.util.ArrayList;
 import java.util.List;
 
+@JsonApiResource(type = "sun_systems")
 public class SunSystem {
-    private List<Long> connections = new ArrayList<Long>();
-    private Long id = null;
-    private String name = null;
-    private List<Planet> planets = new ArrayList<Planet>();
-    private Long x = null;
-    private Long y = null;
-    private Long z = null;
+    private List<SunSystem> connections = new ArrayList<>();
+    @JsonApiId
+    private Long id;
+    private String name;
+    private List<Planet> planets = new ArrayList<>();
+    private Long x;
+    private Long y;
+    private Long z;
 
-    public SunSystem(List<Long> connections, Long id, String name, List<Planet> planets, Long x, Long y, Long z) {
-        this.connections = connections;
+    // creates shallow instance (JSON reference only)
+    public SunSystem(Long id) {
+        this.id = id;
+    }
+
+    public SunSystem(Long id, String name, Long x, Long y, Long z) {
         this.id = id;
         this.name = name;
-        this.planets = planets;
         this.x = x;
         this.y = y;
         this.z = z;
     }
 
-    public List<Long> getConnections() {
+    @JsonApiToMany
+    public List<SunSystem> getConnections() {
         return connections;
     }
 
@@ -34,6 +44,7 @@ public class SunSystem {
         return name;
     }
 
+    @JsonApiToMany
     public List<Planet> getPlanets() {
         return planets;
     }

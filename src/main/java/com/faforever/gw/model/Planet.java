@@ -28,6 +28,12 @@ public class Planet {
         this.size = size;
     }
 
+    // creates shallow instance (JSON reference only)
+    public Planet(Long id, Long fkSunSystem) {
+        this.id = id;
+        this.fkSunSystem = fkSunSystem;
+    }
+
     public static Optional<Planet> selectById(DSLContext create, Long id) {
         return create.selectFrom(PLANET).where(PLANET.ID.equal(id)).fetchOptional(new PlanetMapper());
     }
