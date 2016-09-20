@@ -18,7 +18,11 @@ public class SunSystem {
     private Long y;
     private Long z;
 
-    // creates shallow instance (JSON reference only)
+    /**
+     * creates shallow instance (JSON reference only)
+     *
+     * @param id SunSystem.id
+     */
     public SunSystem(Long id) {
         this.id = id;
     }

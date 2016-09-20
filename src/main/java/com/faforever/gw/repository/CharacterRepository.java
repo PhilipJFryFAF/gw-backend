@@ -1,8 +1,6 @@
 package com.faforever.gw.repository;
 
-import com.faforever.gw.Tables;
 import com.faforever.gw.exceptions.SemanticsException;
-import com.faforever.gw.mapping.CharacterMapper;
 import com.faforever.gw.model.Character;
 import com.faforever.gw.tables.records.RankRecord;
 import io.katharsis.queryParams.QueryParams;
@@ -28,10 +26,6 @@ public class CharacterRepository {
     @Resource
     DSLContext dslContext;
 
-    @Resource
-    CharacterMapper characterMapper;
-
-
     @Lazy
     public CharacterRepository() {
     }
@@ -41,7 +35,7 @@ public class CharacterRepository {
     public Character findOne(Long characterId, QueryParams requestParams) {
         Optional<Character> characterOptional = dslContext.selectFrom(CHARACTER)
                 .where(CHARACTER.ID.equal(characterId))
-                .fetchOptional(characterMapper);
+                .fetchOptionalInto(Character.class);
 
         if (characterOptional.isPresent()) {
             Character character = characterOptional.get();
@@ -81,12 +75,12 @@ public class CharacterRepository {
 
     @JsonApiFindAll
     public Iterable<Character> findAll(QueryParams requestParams) {
-        return dslContext.selectFrom(Tables.CHARACTER).fetch(characterMapper);
+        return null;
     }
 
     @JsonApiFindAllWithIds
     public Iterable<Character> findAll(Iterable<Long> characterIds, QueryParams requestParams) {
-        return dslContext.selectFrom(Tables.CHARACTER).fetch(characterMapper);
+        return null;
     }
 
 }

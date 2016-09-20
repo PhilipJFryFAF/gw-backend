@@ -1,18 +1,14 @@
 package com.faforever.gw.model;
 
-import com.faforever.gw.mapping.CharacterMapper;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.katharsis.resource.annotations.JsonApiId;
 import io.katharsis.resource.annotations.JsonApiResource;
 import io.katharsis.resource.annotations.JsonApiToOne;
 
-import javax.annotation.Resource;
 import java.time.Instant;
 
 @JsonApiResource(type = "characters")
 public class Character {
-    @Resource CharacterMapper characterMapper;
-
     @JsonProperty
     private Long currentCredits;
     @JsonProperty

@@ -1,12 +1,6 @@
 package com.faforever.gw.model;
 
-import com.faforever.gw.mapping.BattleMapper;
-import org.jooq.DSLContext;
-
 import java.sql.Timestamp;
-import java.util.Optional;
-
-import static com.faforever.gw.Tables.BATTLE;
 
 public class Battle {
     private String attackingFaction;
@@ -29,10 +23,6 @@ public class Battle {
         this.startedAt = startedAt;
         this.status = status;
         this.winningFaction = winningFaction;
-    }
-
-    public static Optional<Battle> selectById(DSLContext create, Long battleID) {
-        return create.selectFrom(BATTLE).where(BATTLE.ID.equal(battleID)).fetchOptional(new BattleMapper());
     }
 
     public String getAttackingFaction() {

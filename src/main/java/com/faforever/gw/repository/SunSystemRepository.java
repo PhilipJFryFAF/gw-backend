@@ -42,13 +42,27 @@ public class SunSystemRepository {
                 .fetchInto(Planet.class);
 
         List<SunSystem> connections = dslContext
-                .select(QUANTUM_GATE_LINK.FK_SUN_SYSTEM_TO)
-                .from(QUANTUM_GATE_LINK)
+                .select(SUN_SYSTEM.fields())
+                .from(SUN_SYSTEM)
+                .join(QUANTUM_GATE_LINK)
+                .on(SUN_SYSTEM.ID.eq(QUANTUM_GATE_LINK.FK_SUN_SYSTEM_TO))
                 .where(QUANTUM_GATE_LINK.FK_SUN_SYSTEM_FROM.eq(Id))
                 .fetchInto(SunSystem.class);
 
+        List<Planet> indirect_planets = dslContext
+                .select(PLANET.ID, PLANET.FK_SUN_SYSTEM)
+                .from(PLANET)
+                .join(QUANTUM_GATE_LINK)
+                .on(PLANET.FK_SUN_SYSTEM.eq(QUANTUM_GATE_LINK.FK_SUN_SYSTEM_TO))
+                .fetchInto(Planet.class);
+
         sunSystem.getPlanets().addAll(planets);
         sunSystem.getConnections().addAll(connections);
+
+        connections.stream()
+                .forEach(c -> c.getPlanets().addAll(
+                        indirect_planets.stream().filter(ip -> c.getId() == ip.getSunSystem().getId()).collect(Collectors.toList()))
+                );
 
         return sunSystem;
     }
@@ -72,7 +86,7 @@ public class SunSystemRepository {
                 .forEach(s -> {
                     s.getPlanets().addAll(
                             planets.stream()
-                                    .filter(p -> s.getId() == p.getFkSunSystem())
+                                    .filter(p -> s.getId() == p.getSunSystem().getId())
                                     .collect(Collectors.toList()));
                     quantumGateLinks.stream()
                             .filter(q -> s.getId() == q.getFkSunSystemFrom())
@@ -107,7 +121,7 @@ public class SunSystemRepository {
                 .forEach(s -> {
                     s.getPlanets().addAll(
                             planets.stream()
-                                    .filter(p -> s.getId() == p.getFkSunSystem())
+                                    .filter(p -> s.getId() == p.getSunSystem().getId())
                                     .collect(Collectors.toList()));
                     quantumGateLinks.stream()
                             .filter(q -> s.getId() == q.getFkSunSystemFrom())
