@@ -8,7 +8,7 @@ import io.katharsis.utils.PropertyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-@JsonApiRelationshipRepository(source= Character.class, target =Character.class)
+@JsonApiRelationshipRepository(source = Character.class, target = Character.class)
 @Repository
 public class CharacterToCharacterRepository {
 
@@ -18,9 +18,10 @@ public class CharacterToCharacterRepository {
     public CharacterToCharacterRepository(CharacterRepository characterRepository) {
         this.characterRepository = characterRepository;
     }
+
     @JsonApiFindOneTarget
-    public Character findOneTarget(Long characterId, String fieldName, QueryParams requestParams) {
-        Character character = characterRepository.findOne(characterId, requestParams);
+    public Character findOneTarget(Long id, String fieldName, QueryParams requestParams) {
+        Character character = characterRepository.findOne(id, requestParams);
         try {
             return (Character) PropertyUtils.getProperty(character, fieldName);
         } catch (Exception e) {

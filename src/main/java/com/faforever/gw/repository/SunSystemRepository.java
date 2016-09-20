@@ -9,6 +9,7 @@ import io.katharsis.repository.annotations.JsonApiFindAll;
 import io.katharsis.repository.annotations.JsonApiFindAllWithIds;
 import io.katharsis.repository.annotations.JsonApiFindOne;
 import io.katharsis.repository.annotations.JsonApiResourceRepository;
+import io.katharsis.resource.exception.ResourceNotFoundException;
 import org.jooq.DSLContext;
 import org.jooq.Result;
 import org.springframework.stereotype.Component;
@@ -28,7 +29,28 @@ public class SunSystemRepository {
 
     @JsonApiFindOne
     public SunSystem findOne(Long Id, QueryParams requestParams) {
-        return null;
+        SunSystem sunSystem = dslContext
+                .selectFrom(SUN_SYSTEM)
+                .where(SUN_SYSTEM.ID.eq(Id))
+                .fetchOptionalInto(SunSystem.class)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("SunSystem (id=%s) not found.", Id)));
+
+        List<Planet> planets = dslContext
+                .select(PLANET.ID, PLANET.FK_SUN_SYSTEM)
+                .from(PLANET)
+                .where(PLANET.FK_SUN_SYSTEM.eq(Id))
+                .fetchInto(Planet.class);
+
+        List<SunSystem> connections = dslContext
+                .select(QUANTUM_GATE_LINK.FK_SUN_SYSTEM_TO)
+                .from(QUANTUM_GATE_LINK)
+                .where(QUANTUM_GATE_LINK.FK_SUN_SYSTEM_FROM.eq(Id))
+                .fetchInto(SunSystem.class);
+
+        sunSystem.getPlanets().addAll(planets);
+        sunSystem.getConnections().addAll(connections);
+
+        return sunSystem;
     }
 
     @JsonApiFindAll
