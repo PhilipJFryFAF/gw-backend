@@ -12,6 +12,7 @@ import org.jooq.DSLContext;
 import org.jooq.Field;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.Collection;
 
@@ -22,21 +23,25 @@ import static com.faforever.gw.Tables.PLANET;
 @Component
 public class PlanetRepository {
     @Resource
-    DSLContext dslContext;
-
+    private DSLContext dslContext;
     @Resource
-    SunSystemRepository sunSystemRepository;
+    private SunSystemRepository sunSystemRepository;
 
-    @JsonApiFindOne
-    public Planet findOne(Long Id, QueryParams requestParams) {
-        Field<String> currentOwnerField = dslContext
+    private Field<String> currentOwnerField;
+
+    @PostConstruct
+    public void postConstruct() {
+        currentOwnerField = dslContext
                 .select(BATTLE.WINNING_FACTION)
                 .from(BATTLE)
-                .where(BATTLE.FK_PLANET.eq(Id))
+                .where(BATTLE.FK_PLANET.eq(PLANET.ID))
                 .orderBy(BATTLE.ENDED_AT.desc())
                 .limit(1)
                 .asField("currentOwner");
+    }
 
+    @JsonApiFindOne
+    public Planet findOne(Long Id, QueryParams requestParams) {
         Planet planet = dslContext
                 .select(PLANET.fields())
                 .select(currentOwnerField)
@@ -45,7 +50,7 @@ public class PlanetRepository {
                 .fetchOptionalInto(Planet.class)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("Planet (id=%s) not found.", Id)));
 
-//        SunSystem sunSystem = sunSystemRepository.findOne(planet.getFkSunSystem(), null);
+        planet.setSunSystem(sunSystemRepository.findOne(planet.getSunSystem().getId(), null));
 
         return planet;
     }
@@ -53,7 +58,9 @@ public class PlanetRepository {
     @JsonApiFindAll
     public Iterable<Planet> findAll(QueryParams requestParams) {
         Iterable<Planet> planets = dslContext
-                .selectFrom(PLANET)
+                .select(PLANET.fields())
+                .select(currentOwnerField)
+                .from(PLANET)
                 .fetchInto(Planet.class);
 
         return planets;
@@ -64,8 +71,21 @@ public class PlanetRepository {
         Collection<Long> idCollection = Sets.newHashSet(Ids);
 
         Iterable<Planet> planets = dslContext
-                .selectFrom(PLANET)
+                .select(PLANET.fields())
+                .select(currentOwnerField)
+                .from(PLANET)
                 .where(PLANET.ID.in(idCollection))
+                .fetchInto(Planet.class);
+
+        return planets;
+    }
+
+    public Collection<Planet> findAllBySunSystemId(Long Id) {
+        Collection<Planet> planets = dslContext
+                .select(PLANET.fields())
+                .select(currentOwnerField)
+                .from(PLANET)
+                .where(PLANET.FK_SUN_SYSTEM.eq(Id))
                 .fetchInto(Planet.class);
 
         return planets;

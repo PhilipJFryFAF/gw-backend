@@ -27,6 +27,9 @@ public class SunSystemRepository {
     @Resource
     DSLContext dslContext;
 
+    @Resource
+    PlanetRepository planetRepository;
+
     @JsonApiFindOne
     public SunSystem findOne(Long Id, QueryParams requestParams) {
         SunSystem sunSystem = dslContext
@@ -35,11 +38,7 @@ public class SunSystemRepository {
                 .fetchOptionalInto(SunSystem.class)
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("SunSystem (id=%s) not found.", Id)));
 
-        List<Planet> planets = dslContext
-                .select(PLANET.ID, PLANET.FK_SUN_SYSTEM)
-                .from(PLANET)
-                .where(PLANET.FK_SUN_SYSTEM.eq(Id))
-                .fetchInto(Planet.class);
+        sunSystem.getPlanets().addAll(planetRepository.findAllBySunSystemId(Id));
 
         List<SunSystem> connections = dslContext
                 .select(SUN_SYSTEM.fields())
@@ -56,7 +55,6 @@ public class SunSystemRepository {
                 .on(PLANET.FK_SUN_SYSTEM.eq(QUANTUM_GATE_LINK.FK_SUN_SYSTEM_TO))
                 .fetchInto(Planet.class);
 
-        sunSystem.getPlanets().addAll(planets);
         sunSystem.getConnections().addAll(connections);
 
         connections.stream()

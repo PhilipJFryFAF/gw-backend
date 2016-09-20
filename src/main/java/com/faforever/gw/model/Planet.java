@@ -5,6 +5,8 @@ import io.katharsis.resource.annotations.JsonApiId;
 import io.katharsis.resource.annotations.JsonApiResource;
 import io.katharsis.resource.annotations.JsonApiToOne;
 
+import javax.annotation.Nullable;
+
 @JsonApiResource(type = "planets")
 public class Planet {
     private String currentOwner;
@@ -33,9 +35,9 @@ public class Planet {
      * @param id          Planet.id
      * @param fkSunSystem Planet.fk_sun_system
      */
-    public Planet(Long id, Long fkSunSystem) {
+    public Planet(Long id, @Nullable Long fkSunSystem) {
         this.id = id;
-        this.sunSystem = new SunSystem(fkSunSystem); //TODO: Is this required?
+        this.sunSystem = new SunSystem(fkSunSystem);
     }
 
     @JsonApiToOne
