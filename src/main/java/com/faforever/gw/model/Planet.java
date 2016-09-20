@@ -1,6 +1,6 @@
 package com.faforever.gw.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.katharsis.resource.annotations.JsonApiId;
 import io.katharsis.resource.annotations.JsonApiResource;
 import io.katharsis.resource.annotations.JsonApiToOne;
@@ -53,7 +53,7 @@ public class Planet {
         return currentOwner;
     }
 
-    @JsonIgnore
+    @JsonProperty("fk_map")
     public Long getFkMap() {
         return fkMap;
     }

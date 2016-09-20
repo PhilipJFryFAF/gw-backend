@@ -1,6 +1,7 @@
 package com.faforever.gw.model;
 
 import io.katharsis.resource.annotations.JsonApiId;
+import io.katharsis.resource.annotations.JsonApiIncludeByDefault;
 import io.katharsis.resource.annotations.JsonApiResource;
 import io.katharsis.resource.annotations.JsonApiToMany;
 
@@ -49,6 +50,7 @@ public class SunSystem {
     }
 
     @JsonApiToMany
+    @JsonApiIncludeByDefault
     public List<Planet> getPlanets() {
         return planets;
     }

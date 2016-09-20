@@ -5,20 +5,14 @@ import io.katharsis.resource.annotations.JsonApiId;
 import io.katharsis.resource.annotations.JsonApiResource;
 import io.katharsis.resource.annotations.JsonApiToOne;
 
-import java.time.Instant;
-
 @JsonApiResource(type = "characters")
 public class Character {
-    @JsonProperty
-    private Long currentCredits;
-    @JsonProperty
-    private Long currentXp;
     @JsonProperty
     private String faction;
     @JsonApiId
     private Long id = null;
     @JsonProperty
-    private Instant killedAt;
+    private Long killedAt;
     @JsonApiToOne
     private Character killedBy;
     @JsonProperty
@@ -28,35 +22,24 @@ public class Character {
     @JsonProperty
     private String rankTitle;
 
-    public Character() {
+    /**
+     * creates shallow instance (JSON reference only)
+     *
+     * @param id
+     */
+    public Character(Long id) {
+        this.id = id;
     }
 
-    public Character(Long currentCredits, Long currentXp, String faction, Long id, Instant killedAt, Character killedBy, String name, Long rankId, String rankTitle) {
-        this.currentCredits = currentCredits;
-        this.currentXp = currentXp;
+    public Character(Long id, String name, String faction, Long killedAt, Long killedBy, Long rankId, String rankTitle) {
         this.faction = faction;
         this.id = id;
         this.killedAt = killedAt;
-        this.killedBy = killedBy;
+        if (killedBy != null)
+            this.killedBy = new Character(killedBy);
         this.name = name;
         this.rankId = rankId;
         this.rankTitle = rankTitle;
-    }
-
-    public Long getCurrentCredits() {
-        return (currentCredits == null) ? 0 : currentCredits;
-    }
-
-    public void setCurrentCredits(Long currentCredits) {
-        this.currentCredits = currentCredits;
-    }
-
-    public Long getCurrentXp() {
-        return (currentXp == null) ? 0 : currentXp;
-    }
-
-    public void setCurrentXp(Long currentXp) {
-        this.currentXp = currentXp;
     }
 
     public String getFaction() {
@@ -75,11 +58,11 @@ public class Character {
         this.id = id;
     }
 
-    public Instant getKilledAt() {
+    public Long getKilledAt() {
         return killedAt;
     }
 
-    public void setKilledAt(Instant killedAt) {
+    public void setKilledAt(Long killedAt) {
         this.killedAt = killedAt;
     }
 

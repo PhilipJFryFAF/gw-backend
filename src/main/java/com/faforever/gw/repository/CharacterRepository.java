@@ -1,8 +1,7 @@
 package com.faforever.gw.repository;
 
-import com.faforever.gw.exceptions.SemanticsException;
 import com.faforever.gw.model.Character;
-import com.faforever.gw.tables.records.RankRecord;
+import com.google.common.collect.Sets;
 import io.katharsis.queryParams.QueryParams;
 import io.katharsis.repository.annotations.JsonApiFindAll;
 import io.katharsis.repository.annotations.JsonApiFindAllWithIds;
@@ -10,77 +9,136 @@ import io.katharsis.repository.annotations.JsonApiFindOne;
 import io.katharsis.repository.annotations.JsonApiResourceRepository;
 import io.katharsis.resource.exception.ResourceNotFoundException;
 import org.jooq.DSLContext;
-import org.springframework.context.annotation.Lazy;
+import org.jooq.impl.DSL;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.Optional;
+import java.util.Collection;
 
 import static com.faforever.gw.Tables.*;
-import static org.jooq.impl.DSL.sum;
-
-
 @JsonApiResourceRepository(Character.class)
 @Component
 public class CharacterRepository {
+    /***
+     * SQL SELECT:
+     SELECT `character`.`id`, `character`.`name`, `character`.`faction`, `battle_participant`.`fk_battle` AS 'killed_at', `character`.`killed_by`, `promotion`.`new_rank` AS 'rank',
+     (CASE `character`.`faction`
+     WHEN 'A' THEN `rank`.`uef_title`
+     WHEN 'C' THEN `rank`.`aeon_title`
+     WHEN 'U' THEN `rank`.`uef_title`
+     WHEN 'S' THEN `rank`.`cybran_title`
+     END) AS "title"
+     FROM `character`
+     LEFT JOIN `battle_participant`
+     ON `character`.`id` = `battle_participant`.`fk_character` AND `battle_participant`.`result` = 'D'
+     JOIN (SELECT p1.`new_rank`, p1.`fk_character` FROM `promotion` AS p1
+     LEFT JOIN `promotion` AS p2
+     ON p1.`fk_character` = p2.`fk_character` AND p1.`created_at` < p2.`created_at`
+     WHERE p2.`created_at` IS NULL
+     ORDER BY `p1`.`fk_character` ASC) As `promotion`
+     ON `character`.`id` = `promotion`.`fk_character`
+     JOIN `rank`
+     ON `rank`.`level` = `promotion`.`new_rank`
+     *
+     */
+
     @Resource
     DSLContext dslContext;
 
-    @Lazy
-    public CharacterRepository() {
-    }
-
-
     @JsonApiFindOne
-    public Character findOne(Long characterId, QueryParams requestParams) {
-        Optional<Character> characterOptional = dslContext.selectFrom(CHARACTER)
-                .where(CHARACTER.ID.equal(characterId))
-                .fetchOptionalInto(Character.class);
+    public Character findOne(Long Id, QueryParams requestParams) {
+        com.faforever.gw.tables.Promotion p1 = PROMOTION.as("p1");
+        com.faforever.gw.tables.Promotion p2 = PROMOTION.as("p2");
 
-        if (characterOptional.isPresent()) {
-            Character character = characterOptional.get();
+        Character character = dslContext
+                .select(CHARACTER.ID, CHARACTER.NAME, CHARACTER.FACTION, BATTLE_PARTICIPANT.FK_BATTLE, CHARACTER.KILLED_BY, PROMOTION.NEW_RANK,
+                        DSL.choose(CHARACTER.FACTION)
+                                .when("A", RANK.AEON_TITLE)
+                                .when("C", RANK.CYBRAN_TITLE)
+                                .when("U", RANK.UEF_TITLE)
+                                .when("S", RANK.SERAPH_TITLE)
+                ).from(CHARACTER)
+                .leftJoin(BATTLE_PARTICIPANT)
+                .on(CHARACTER.ID.eq(BATTLE_PARTICIPANT.FK_CHARACTER)).and(BATTLE_PARTICIPANT.RESULT.eq("D"))
+                .join(
+                        dslContext.select(p1.NEW_RANK, p1.FK_CHARACTER)
+                                .from(p1)
+                                .leftJoin(p2)
+                                .on(p1.FK_CHARACTER.eq(p2.FK_CHARACTER))
+                                .and(p1.CREATED_AT.lt(p2.CREATED_AT))
+                                .where(p2.CREATED_AT.isNull())
+                                .asTable("promotion")
+                )
+                .on(CHARACTER.ID.eq(PROMOTION.FK_CHARACTER))
+                .join(RANK)
+                .on(RANK.LEVEL.eq(PROMOTION.NEW_RANK))
+                .where(CHARACTER.ID.eq(Id))
+                .fetchOptionalInto(Character.class)
+                .orElseThrow(() -> new ResourceNotFoundException(String.format("Character (id=%s) not found.", Id)));
 
-            Long currentCredits = dslContext.select(sum(CREDIT_JOURNAL.AMOUNT)).from(CREDIT_JOURNAL).where(CREDIT_JOURNAL.FK_CHARACTER.equal(characterId)).fetchOneInto(Long.class);
-            character.setCurrentCredits(currentCredits);
-
-            Long currentXp = dslContext.select(sum(XP_JOURNAL.AMOUNT)).from(XP_JOURNAL).where(XP_JOURNAL.FK_CHARACTER.equal(characterId)).fetchOneInto(Long.class);
-            character.setCurrentXp(currentXp);
-
-            Long rankId = dslContext.select(PROMOTION.NEW_RANK).from(PROMOTION).where(PROMOTION.FK_CHARACTER.equal(characterId)).orderBy(PROMOTION.CREATED_AT.desc()).limit(1).fetchOneInto(Long.class);
-            character.setRankId(rankId);
-
-            RankRecord ranksRecord = dslContext.selectFrom(RANK).where(RANK.LEVEL.eq(character.getRankId())).fetchOptionalInto(RankRecord.class)
-                    .orElseThrow(() -> new SemanticsException("There must be a rank for each character rank level."));
-
-            switch (character.getFaction()) {
-                case "A":
-                    character.setRankTitle(ranksRecord.getAeonTitle());
-                    break;
-                case "C":
-                    character.setRankTitle(ranksRecord.getCybranTitle());
-                    break;
-                case "S":
-                    character.setRankTitle(ranksRecord.getSeraphTitle());
-                    break;
-                case "U":
-                    character.setRankTitle(ranksRecord.getUefTitle());
-                    break;
-            }
-
-            return character;
-        }
-
-        throw new ResourceNotFoundException("Character not found!");
+        return character;
     }
 
     @JsonApiFindAll
     public Iterable<Character> findAll(QueryParams requestParams) {
-        return null;
+        com.faforever.gw.tables.Promotion p1 = PROMOTION.as("p1");
+        com.faforever.gw.tables.Promotion p2 = PROMOTION.as("p2");
+
+        return dslContext
+                .select(CHARACTER.ID, CHARACTER.NAME, CHARACTER.FACTION, BATTLE_PARTICIPANT.FK_BATTLE, CHARACTER.KILLED_BY, PROMOTION.NEW_RANK,
+                        DSL.choose(CHARACTER.FACTION)
+                                .when("A", RANK.AEON_TITLE)
+                                .when("C", RANK.CYBRAN_TITLE)
+                                .when("U", RANK.UEF_TITLE)
+                                .when("S", RANK.SERAPH_TITLE)
+                ).from(CHARACTER)
+                .leftJoin(BATTLE_PARTICIPANT)
+                .on(CHARACTER.ID.eq(BATTLE_PARTICIPANT.FK_CHARACTER)).and(BATTLE_PARTICIPANT.RESULT.eq("D"))
+                .join(
+                        dslContext.select(p1.NEW_RANK, p1.FK_CHARACTER)
+                                .from(p1)
+                                .leftJoin(p2)
+                                .on(p1.FK_CHARACTER.eq(p2.FK_CHARACTER))
+                                .and(p1.CREATED_AT.lt(p2.CREATED_AT))
+                                .where(p2.CREATED_AT.isNull())
+                                .asTable("promotion")
+                )
+                .on(CHARACTER.ID.eq(PROMOTION.FK_CHARACTER))
+                .join(RANK)
+                .on(RANK.LEVEL.eq(PROMOTION.NEW_RANK))
+                .fetchInto(Character.class);
     }
 
     @JsonApiFindAllWithIds
-    public Iterable<Character> findAll(Iterable<Long> characterIds, QueryParams requestParams) {
-        return null;
+    public Iterable<Character> findAll(Iterable<Long> Ids, QueryParams requestParams) {
+        Collection<Long> idCollection = Sets.newHashSet(Ids);
+
+        com.faforever.gw.tables.Promotion p1 = PROMOTION.as("p1");
+        com.faforever.gw.tables.Promotion p2 = PROMOTION.as("p2");
+
+        return dslContext
+                .select(CHARACTER.ID, CHARACTER.NAME, CHARACTER.FACTION, BATTLE_PARTICIPANT.FK_BATTLE, CHARACTER.KILLED_BY, PROMOTION.NEW_RANK,
+                        DSL.choose(CHARACTER.FACTION)
+                                .when("A", RANK.AEON_TITLE)
+                                .when("C", RANK.CYBRAN_TITLE)
+                                .when("U", RANK.UEF_TITLE)
+                                .when("S", RANK.SERAPH_TITLE)
+                ).from(CHARACTER)
+                .leftJoin(BATTLE_PARTICIPANT)
+                .on(CHARACTER.ID.eq(BATTLE_PARTICIPANT.FK_CHARACTER)).and(BATTLE_PARTICIPANT.RESULT.eq("D"))
+                .join(
+                        dslContext.select(p1.NEW_RANK, p1.FK_CHARACTER)
+                                .from(p1)
+                                .leftJoin(p2)
+                                .on(p1.FK_CHARACTER.eq(p2.FK_CHARACTER))
+                                .and(p1.CREATED_AT.lt(p2.CREATED_AT))
+                                .where(p2.CREATED_AT.isNull())
+                                .asTable("promotion")
+                )
+                .on(CHARACTER.ID.eq(PROMOTION.FK_CHARACTER))
+                .join(RANK)
+                .on(RANK.LEVEL.eq(PROMOTION.NEW_RANK))
+                .where(CHARACTER.ID.in(idCollection)).fetchInto(Character.class);
     }
 
 }
