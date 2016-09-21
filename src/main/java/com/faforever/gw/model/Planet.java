@@ -3,9 +3,12 @@ package com.faforever.gw.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.katharsis.resource.annotations.JsonApiId;
 import io.katharsis.resource.annotations.JsonApiResource;
+import io.katharsis.resource.annotations.JsonApiToMany;
 import io.katharsis.resource.annotations.JsonApiToOne;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.List;
 
 @JsonApiResource(type = "planets")
 public class Planet {
@@ -17,6 +20,7 @@ public class Planet {
     private Long orbitLevel;
     private Long size;
     private SunSystem sunSystem;
+    private List<Battle> battles;
 
     public Planet(Long id, Long fkSunSystem, Long fkMap, Long orbitLevel, Long size, Boolean habitable, String ground, String currentOwner) {
         this.currentOwner = currentOwner;
@@ -27,6 +31,7 @@ public class Planet {
         this.id = id;
         this.orbitLevel = orbitLevel;
         this.size = size;
+        this.battles = new ArrayList<Battle>();
     }
 
     /**
@@ -38,6 +43,11 @@ public class Planet {
     public Planet(Long id, @Nullable Long fkSunSystem) {
         this.id = id;
         this.sunSystem = new SunSystem(fkSunSystem);
+    }
+
+    @JsonApiToMany
+    public List<Battle> getBattles() {
+        return battles;
     }
 
     @JsonApiToOne

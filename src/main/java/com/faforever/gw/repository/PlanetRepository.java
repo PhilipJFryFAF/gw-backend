@@ -1,5 +1,6 @@
 package com.faforever.gw.repository;
 
+import com.faforever.gw.model.Battle;
 import com.faforever.gw.model.Planet;
 import com.google.common.collect.Sets;
 import io.katharsis.queryParams.QueryParams;
@@ -51,6 +52,11 @@ public class PlanetRepository {
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("Planet (id=%s) not found.", Id)));
 
         planet.setSunSystem(sunSystemRepository.findOne(planet.getSunSystem().getId(), null));
+
+        planet.getBattles().addAll(dslContext
+                .selectFrom(BATTLE)
+                .where(BATTLE.FK_PLANET.eq(Id))
+                .fetchInto(Battle.class));
 
         return planet;
     }
