@@ -2,9 +2,13 @@ package com.faforever.gw.model;
 
 import io.katharsis.resource.annotations.JsonApiId;
 import io.katharsis.resource.annotations.JsonApiResource;
+import io.katharsis.resource.annotations.JsonApiToMany;
 import io.katharsis.resource.annotations.JsonApiToOne;
 
+import javax.annotation.Nullable;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.List;
 
 @JsonApiResource(type = "battles")
 public class Battle {
@@ -17,6 +21,7 @@ public class Battle {
     private Timestamp startedAt;
     private String status;
     private String winningFaction;
+    private List<BattleParticipant> battleParticipants;
 
     public Battle(Long id, Long fkPlanet, String status, Timestamp initiatedAt, Timestamp startedAt, Timestamp endedAt, String attackingFaction, String defendingFaction, String winningFaction) {
         this.attackingFaction = attackingFaction;
@@ -28,6 +33,23 @@ public class Battle {
         this.startedAt = startedAt;
         this.status = status;
         this.winningFaction = winningFaction;
+        this.battleParticipants = new ArrayList<>();
+    }
+
+    /**
+     * creates shallow instance (JSON reference only)
+     *
+     * @param id
+     * @param fkPlanet
+     */
+    public Battle(Long id, @Nullable Long fkPlanet) {
+        this.id = id;
+        this.planet = new Planet(fkPlanet, null);
+    }
+
+    @JsonApiToMany
+    public List<BattleParticipant> getBattleParticipants() {
+        return battleParticipants;
     }
 
     public String getAttackingFaction() {

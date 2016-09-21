@@ -25,6 +25,9 @@ public class BattleRepository {
     @Resource
     PlanetRepository planetRepository;
 
+    @Resource
+    BattleParticipantRepository battleParticipantRepository;
+
     @JsonApiFindOne
     public Battle findOne(Long Id, QueryParams requestParams) {
         Battle battle = dslContext
@@ -34,6 +37,8 @@ public class BattleRepository {
                 .orElseThrow(() -> new ResourceNotFoundException(String.format("Battle (id=%s) not found.", Id)));
 
         battle.setPlanet(planetRepository.findOne(battle.getPlanet().getId(), null));
+
+        battle.getBattleParticipants().addAll(battleParticipantRepository.findAllByBattleId(battle.getId()));
 
         return battle;
     }
