@@ -102,8 +102,8 @@ public class CharacterNameGenerator {
 				"Godfrey", "Gustav", "Gunter", "Harald", "Hieronymus", "Hildagarde", "Ernst", "Otto", "Karl", "Lukas", "Felix", "Hermann", "Artur", "Bruno",
 				"Wilhelm", "Erich", "Rudolph", "Walter", "Werner", "Kurt", "Immanuel", "Rolf", "Ulrich", "Alfons", "Christoph", "Nikolaus", "Theodor", "Leopold",
 				//German Female
-                "Greta", "Frieda", "Mathilda", "Dietrich", "Angela", "Ada", "Adele", "Angelika", "Ava", "Mathilda", "Erika", "Ethelinda", "Genevieve", "Grisella",
-                "Heidemaria", "Wilma", "Irmina", "Karlina", "Karoline", "Brigitte", "Magdalene", "Margarite", "Marlene", "Monika", "Odelina", "Olinda", "Roderika", "Selma",
+                "Greta", "Frieda", "Mathilda", "Dietrich", "Angela", "Ada", "Adele", "Angelika", "Ava", "Mathilda", "Erika", "Elisabet", "Heidi", "Wanda",
+                "Heidemaria", "Wilma", "Irmina", "Karlina", "Karoline", "Brigitte", "Magdalene", "Margarite", "Marlene", "Monika", "Odelina", "Renate", "Roderika", "Selma",
 				"Ulrike", "Wendeline", "Wilma", "Zeta",
 				//Russian Male
 				"Abram", "Aleksy","Ivan", "Peter", "Artem", "Artyom", "Borislav", "Bronislav", "David", "Dmitri", "Nikolai", "Evgeny", "Grigori", "Isidor",
@@ -118,14 +118,14 @@ public class CharacterNameGenerator {
 
 		symbiontSurnames = new String[]{
                 //German names:
-                "Wagner", "Wolff", "Bauer", "Hofmann", "Gunther", "Albrecht", "Baumann", "Friedrich", "Jager", "Pietsch",
-                "Altergott", "Andelman", "Brecher", "Beckendorf", "Beissel", "Breslau", "Ehrhardt", "Junker", "Kanitz", "Kaiser", "Kauffman",
+                "Wagner", "Wolf", "Bauer", "Hofmann", "Gunther", "Albrecht", "Baumann", "Friedrich", "Jäger", "Pietsch",
+                "Stich", "Andelman", "Brecher", "Beckendorf", "Beissel", "Breslau", "Ehrhardt", "Junker", "Kanitz", "Kaiser", "Kauffman",
                 "Klock", "Klaus", "Kreuzer", "Lehr", "Lentz", "Meissner", "Moldenhauer", "Prinz", "Reichman", "Reinhardt", "Radunz", "Rossman", "Schult",
-                "Schwarzkopf", "Selig", "Sohn", "Stauben", "Steiner", "Strobl", "Sulz", "Thalberg", "Trager", "Voss", "Vogel", "Wachter", "Wahrmann", "Wohl",
-				"Zeigler", "Zorn", "Kruger", "Friedrich", "Winter", "Brandt", "Busch", "Schroder", "Beyer", "Bodmann", "Bruckner", "Becher", "Bachman", "Eichmann",
-				"Erhard", "Bismark", "Anacker", "Goring", "Hausser", "Wilhelm", "Jaeger", "Kampf", "Kiesinger", "Kraftman", "Kohlmann", "Kern", "Macher", "Moder",
-				"Meyer", "Oberlander", "Oberg", "Reinecke", "Rainer", "Franz", "Oswald", "Schafer", "Stark", "Straube", "Oskar", "Weidenmann", "Weber",
-				"Lautenberg", "Heinrich", "Schumer", "Inhofe",
+                "Schwarzkopf", "Selig", "Schuhmacher", "Stauben", "Steiner", "Strobl", "Sulz", "Thalberg", "Trager", "Voss", "Vogel", "Wachter", "Wahrmann", "Wohl",
+				"Zeigler", "Zorn", "Krüger", "Friedrich", "Winter", "Brandt", "Busch", "Schröder", "Beyer", "Bodmann", "Bruckner", "Becher", "Bachman", "Eichmann",
+				"Erhard", "Mauer", "Anacker", "Fischer", "Hausser", "Wilhelm", "Hackl", "Kiesinger", "Kraftman", "Kohlmann", "Kern", "Macher", "Moder",
+				"Meyer", "Mitterlehner", "Oberg", "Reinecke", "Rainer", "Franz", "Oswald", "Schäfer", "Stark", "Straube", "Oskar", "Weidenmann", "Weber",
+				"Lautenberg", "Heinrich", "Schumer", "König",
 				//Russian names:
                 "Mikhailov", "Rokossovsky", "Isatova", "Glayanov", "Markov", "Donskoy", "Brin",
                 "Velsky", "Durov", "Lebedev", "Lupanov", "Morozov", "Pavlov", "Stepanov", "Skylarov", "Terekov", "Turchiv", "Ternovsky", "Yablonsky",
